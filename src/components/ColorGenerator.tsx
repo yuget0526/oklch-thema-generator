@@ -418,15 +418,16 @@ export default function ColorGenerator() {
           <div className="flex-1 overflow-hidden relative">
             <TabsContent
               value="preview"
-              className="absolute inset-0 m-0 h-full w-full animate-in fade-in duration-300"
+              className="absolute inset-0 m-0 h-full w-full animate-in fade-in duration-300 overflow-y-auto"
             >
-              <div className="h-full w-full" ref={previewRef}>
+              <div className="min-h-full w-full" ref={previewRef}>
                 <NestedLayerPreview
                   layers={activeLayers}
                   primary={primaryVariants}
                   secondary={secondaryVariants}
                   tertiary={tertiaryVariants}
                   mode={baseMode}
+                  backgroundColor={currentBgHex}
                   overrides={currentModeOverrides}
                 />
               </div>

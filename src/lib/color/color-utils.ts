@@ -155,7 +155,7 @@ export function generateBrandColors(
 
     // Generate Dark Main from Light Main
     // Dark Main: Adjusted for dark background (Lighter, Pastel)
-    let darkMainL = 0.75;
+    const darkMainL = 0.75;
     const darkMainOklchRaw: Oklch = {
       ...lightMainOklch,
       l: darkMainL,
@@ -175,7 +175,7 @@ export function generateBrandColors(
     // Light Main: Adjusted for light background (Darker, Saturated)
     // If user picked a pastel color for dark mode, we need to darken it for light mode.
     // Target L around 0.5 - 0.6?
-    let lightMainL = 0.55;
+    const lightMainL = 0.55;
     const lightMainOklchRaw: Oklch = {
       ...darkMainOklch,
       l: lightMainL,

@@ -38,7 +38,7 @@ export default function ContrastBadge({
   return (
     <div
       className={cn(
-        "flex items-center gap-1 text-[10px] font-mono bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded-full text-white shadow-sm border border-white/10",
+        "flex items-center gap-1.5 text-[10px] font-mono bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg text-white shadow-sm border border-white/10 w-[100px]",
         className
       )}
       title={`WCAG Ratio: ${formatRatio(ratio)} (AA: ${
@@ -47,14 +47,17 @@ export default function ContrastBadge({
         apca
       )} (${apcaLevel})`}
     >
-      <Icon size={10} className={statusColor} />
-      <span>{formatRatio(ratio)}</span>
-      <span className="opacity-40 mx-0.5">|</span>
-      <span className="text-[9px] opacity-80" title={`APCA: ${apcaLevel}`}>
-        Lc {Math.round(Math.abs(apca))}
-      </span>
-      {aaa && <span className="text-[9px] opacity-70 ml-0.5">AAA</span>}
-      {!aaa && aa && <span className="text-[9px] opacity-70 ml-0.5">AA</span>}
+      <Icon size={12} className={statusColor} />
+      <div className="flex flex-col leading-none gap-0.5 items-start">
+        <div className="flex items-center gap-1">
+          <span className="font-bold">{formatRatio(ratio)}</span>
+          <span className="opacity-40">|</span>
+          <span className="opacity-90">{aaa ? "AAA" : aa ? "AA" : "-"}</span>
+        </div>
+        <div className="text-[9px] opacity-70">
+          Lc {Math.round(Math.abs(apca))}
+        </div>
+      </div>
     </div>
   );
 }
