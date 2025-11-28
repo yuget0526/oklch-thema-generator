@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo } from "react";
+import { oklch, formatHex } from "culori";
 import { LightnessChart } from "@/components/LightnessChart";
 import {
   ThemeMode,
@@ -25,6 +26,8 @@ import {
   Moon,
   Menu,
 } from "lucide-react";
+import BackgroundColorControls from "@/components/BackgroundColorControls";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
@@ -51,9 +54,10 @@ export default function ColorGenerator() {
     undefined
   );
 
-  // Refs for screenshot capture
-  const previewRef = useRef<HTMLDivElement>(null);
-  const paletteRef = useRef<HTMLDivElement>(null);
+  // Background color state
+  const [bgMode, setBgMode] = useState<"sync" | "custom">("sync");
+  const [customBgHue, setCustomBgHue] = useState<number | null>(null);
+  const [customBgChroma, setCustomBgChroma] = useState<number | null>(null);
 
   // Handlers with reset logic
   const handleLayerCountChange = (count: number) => {
@@ -69,6 +73,74 @@ export default function ColorGenerator() {
   const handleDirectionChange = (dir: "normal" | "inverted") => {
     setLayerDirection(dir);
     setCustomLightness(undefined);
+  };
+
+  // Background color validation
+  const validateChroma = (chroma: number): number => {
+    const MAX_CHROMA = 0.01;
+    if (chroma > MAX_CHROMA) {
+      toast.info("Chroma adjusted to 0.01 for readability", {
+        description: "Background chroma was too high",
+      });
+      return MAX_CHROMA;
+    }
+    return chroma;
+  };
+
+  // Background color handlers
+  const handleBgModeChange = (isCustom: boolean) => {
+    if (isCustom) {
+      // Switch to Custom mode
+      setCustomBgHue(primaryVariants[0].oklch.h || 0);
+      setCustomBgChroma(0.008);
+      setBgMode("custom");
+    } else {
+      // Switch to Sync mode
+      setCustomBgHue(null);
+      setCustomBgChroma(null);
+      setBgMode("sync");
+    }
+  };
+
+  const handleBgHueChange = (hue: number) => {
+    setCustomBgHue(hue);
+    if (bgMode === "sync") {
+      setBgMode("custom");
+    }
+  };
+
+  const handleBgChromaChange = (chroma: number) => {
+    const validated = validateChroma(chroma);
+    setCustomBgChroma(validated);
+    if (bgMode === "sync") {
+      setBgMode("custom");
+    }
+  };
+
+  const handleBgHexChange = (hex: string) => {
+    // Convert HEX to OKLCH
+    const color = oklch(hex);
+    if (!color) return;
+
+    const hue = color.h || 0;
+    let chroma = color.c || 0;
+
+    // Validate and correct chroma if necessary
+    const MAX_CHROMA = 0.01;
+    if (chroma > MAX_CHROMA) {
+      toast.info("Chroma adjusted to 0.01 for readability", {
+        description: `Hue (${Math.round(hue)}°) preserved, chroma corrected`,
+      });
+      chroma = MAX_CHROMA;
+    }
+
+    // Update both hue and chroma
+    setCustomBgHue(hue);
+    setCustomBgChroma(chroma);
+
+    if (bgMode === "sync") {
+      setBgMode("custom");
+    }
   };
 
   // Derived State - Brand Colors (3 variants)
@@ -87,18 +159,51 @@ export default function ColorGenerator() {
     [tertiaryColor]
   );
 
+  // Derived State - Background color values
+  const effectiveBgHue = useMemo(() => {
+    if (bgMode === "sync") {
+      return primaryVariants[0].oklch.h || 0;
+    }
+    return customBgHue ?? (primaryVariants[0].oklch.h || 0);
+  }, [bgMode, customBgHue, primaryVariants]);
+
+  const effectiveBgChroma = useMemo(() => {
+    if (bgMode === "sync") {
+      return 0.008;
+    }
+    return customBgChroma ?? 0.008;
+  }, [bgMode, customBgChroma]);
+
+  // Current background color as HEX
+  const currentBgHex = useMemo(() => {
+    const bgColor = oklch({
+      mode: "oklch",
+      l: baseMode === "light" ? 0.98 : 0.15,
+      c: effectiveBgChroma,
+      h: effectiveBgHue,
+    });
+    return formatHex(bgColor) || "#FFFFFF";
+  }, [effectiveBgHue, effectiveBgChroma, baseMode]);
+
   // Derived State - Layer Scales (Backgrounds)
   const layerScales = useMemo(
     () =>
       generateLayerScale(
-        primaryVariants[0].oklch.h || 0,
-        0.008, // Reduced from 0.02 to 0.008 for subtler tint
+        effectiveBgHue,
+        effectiveBgChroma,
         layerCount,
         baseMode,
         layerDirection,
         customLightness
       ),
-    [primaryVariants, layerCount, baseMode, layerDirection, customLightness]
+    [
+      effectiveBgHue,
+      effectiveBgChroma,
+      layerCount,
+      baseMode,
+      layerDirection,
+      customLightness,
+    ]
   );
 
   const oppositeMode = baseMode === "light" ? "dark" : "light";
@@ -171,6 +276,15 @@ export default function ColorGenerator() {
     handleRemoveChromaGroup,
     currentLightnessValues,
     setCustomLightness,
+    // Background color props
+    bgMode,
+    effectiveBgHue,
+    effectiveBgChroma,
+    currentBgHex,
+    handleBgModeChange,
+    handleBgHueChange,
+    handleBgChromaChange,
+    handleBgHexChange,
   };
 
   return (
@@ -386,6 +500,15 @@ interface SidebarContentProps {
   handleRemoveChromaGroup: (id: string) => void;
   currentLightnessValues: number[];
   setCustomLightness: (values: number[] | undefined) => void;
+  // Background color props
+  bgMode: "sync" | "custom";
+  effectiveBgHue: number;
+  effectiveBgChroma: number;
+  currentBgHex: string;
+  handleBgModeChange: (isCustom: boolean) => void;
+  handleBgHueChange: (hue: number) => void;
+  handleBgChromaChange: (chroma: number) => void;
+  handleBgHexChange: (hex: string) => void;
 }
 
 function SidebarContent({
@@ -405,6 +528,15 @@ function SidebarContent({
   handleRemoveChromaGroup,
   currentLightnessValues,
   setCustomLightness,
+  // Background color props
+  bgMode,
+  effectiveBgHue,
+  effectiveBgChroma,
+  currentBgHex,
+  handleBgModeChange,
+  handleBgHueChange,
+  handleBgChromaChange,
+  handleBgHexChange,
 }: SidebarContentProps) {
   // Determine chart range based on mode
   const chartMin = baseMode === "light" ? 0.8 : 0.0;
@@ -451,6 +583,17 @@ function SidebarContent({
                 max={chartMax}
               />
             </div>
+
+            <BackgroundColorControls
+              mode={bgMode}
+              hue={effectiveBgHue}
+              chroma={effectiveBgChroma}
+              currentHex={currentBgHex}
+              onModeChange={handleBgModeChange}
+              onHueChange={handleBgHueChange}
+              onChromaChange={handleBgChromaChange}
+              onHexChange={handleBgHexChange}
+            />
 
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
