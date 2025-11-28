@@ -254,24 +254,28 @@ export function NestedLayerPreview({
                   bgColor={resolvedL4?.hex}
                   fgColor={resolvedL4?.onHex}
                 />
-                <VariantColumn
-                  title="Secondary"
-                  variants={secondary}
-                  mainColor={resolveColor(secondary[0]).hex}
-                  resolveColor={resolveColor}
-                  mode={mode}
-                  bgColor={resolvedL4?.hex}
-                  fgColor={resolvedL4?.onHex}
-                />
-                <VariantColumn
-                  title="Tertiary"
-                  variants={tertiary}
-                  mainColor={resolveColor(tertiary[0]).hex}
-                  resolveColor={resolveColor}
-                  mode={mode}
-                  bgColor={resolvedL4?.hex}
-                  fgColor={resolvedL4?.onHex}
-                />
+                {secondary.length > 0 && (
+                  <VariantColumn
+                    title="Secondary"
+                    variants={secondary}
+                    mainColor={resolveColor(secondary[0]).hex}
+                    resolveColor={resolveColor}
+                    mode={mode}
+                    bgColor={resolvedL4?.hex}
+                    fgColor={resolvedL4?.onHex}
+                  />
+                )}
+                {tertiary.length > 0 && (
+                  <VariantColumn
+                    title="Tertiary"
+                    variants={tertiary}
+                    mainColor={resolveColor(tertiary[0]).hex}
+                    resolveColor={resolveColor}
+                    mode={mode}
+                    bgColor={resolvedL4?.hex}
+                    fgColor={resolvedL4?.onHex}
+                  />
+                )}
               </div>
             </div>
           </div>

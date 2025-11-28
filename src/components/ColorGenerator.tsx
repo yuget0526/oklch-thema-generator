@@ -44,8 +44,11 @@ import { Switch } from "@/components/ui/switch";
 export default function ColorGenerator() {
   // State
   const [primaryColor, setPrimaryColor] = useState<string>("#3b82f6");
-  const [secondaryColor, setSecondaryColor] = useState<string>("#10b981");
+  const [secondaryColor, setSecondaryColor] = useState<string>("#059669");
   const [tertiaryColor, setTertiaryColor] = useState<string>("#f43f5e");
+
+  const [showSecondary, setShowSecondary] = useState<boolean>(true);
+  const [showTertiary, setShowTertiary] = useState<boolean>(true);
 
   const [layerCount, setLayerCount] = useState<number>(5);
   const [baseMode, setBaseMode] = useState<ThemeMode>("light");
@@ -208,16 +211,12 @@ export default function ColorGenerator() {
     "primary",
     baseMode
   );
-  const secondaryVariants = generateBrandColors(
-    secondaryColor,
-    "secondary",
-    baseMode
-  );
-  const tertiaryVariants = generateBrandColors(
-    tertiaryColor,
-    "tertiary",
-    baseMode
-  );
+  const secondaryVariants = showSecondary
+    ? generateBrandColors(secondaryColor, "secondary", baseMode)
+    : [];
+  const tertiaryVariants = showTertiary
+    ? generateBrandColors(tertiaryColor, "tertiary", baseMode)
+    : [];
 
   // Derived State - Background color values
   const effectiveBgHue = (() => {
@@ -347,6 +346,10 @@ export default function ColorGenerator() {
     setSecondaryColor,
     tertiaryColor,
     setTertiaryColor,
+    showSecondary,
+    setShowSecondary,
+    showTertiary,
+    setShowTertiary,
     chromaGroups,
     handleAddChromaGroup,
     handleRemoveChromaGroup,
@@ -614,6 +617,10 @@ interface SidebarContentProps {
   setSecondaryColor: (color: string) => void;
   tertiaryColor: string;
   setTertiaryColor: (color: string) => void;
+  showSecondary: boolean;
+  setShowSecondary: (show: boolean) => void;
+  showTertiary: boolean;
+  setShowTertiary: (show: boolean) => void;
   chromaGroups: ChromaGroup[];
   handleAddChromaGroup: (group: ChromaGroup) => void;
   handleRemoveChromaGroup: (id: string) => void;
@@ -642,6 +649,10 @@ function SidebarContent({
   setSecondaryColor,
   tertiaryColor,
   setTertiaryColor,
+  showSecondary,
+  setShowSecondary,
+  showTertiary,
+  setShowTertiary,
   chromaGroups,
   handleAddChromaGroup,
   handleRemoveChromaGroup,
@@ -665,10 +676,12 @@ function SidebarContent({
     <div className="flex flex-col h-full">
       <div className="h-16 px-6 border-b flex items-center justify-between flex-shrink-0">
         <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg">
-            O
-          </div>
-          <span className="font-bold text-lg tracking-tight">OKLCH Gen</span>
+          <img
+            src="/gigaptera_logo_hue.svg"
+            alt="A11yPalette Logo"
+            className="w-8 h-8"
+          />
+          <span className="font-bold text-lg tracking-tight">a11yPalette</span>
         </div>
       </div>
 
@@ -753,12 +766,16 @@ function SidebarContent({
                 color={secondaryColor}
                 onChange={setSecondaryColor}
                 mode={baseMode}
+                disabled={!showSecondary}
+                onToggle={setShowSecondary}
               />
               <OKLCHColorPicker
                 label="Tertiary"
                 color={tertiaryColor}
                 onChange={setTertiaryColor}
                 mode={baseMode}
+                disabled={!showTertiary}
+                onToggle={setShowTertiary}
               />
             </div>
           </section>

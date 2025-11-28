@@ -54,7 +54,7 @@ export default function CodeExporter({
       { name: "primary", variants: primary },
       { name: "secondary", variants: secondary },
       { name: "tertiary", variants: tertiary },
-    ];
+    ].filter((role) => role.variants.length > 0);
 
     let css = `:root {\n`;
 
