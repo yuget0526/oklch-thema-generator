@@ -66,7 +66,7 @@ export default function OKLCHColorPicker({
   const c = oklch.c || 0;
   const h = oklch.h || 0;
 
-  const isLightnessOutOfRange = l < 0.4 || l > 0.7;
+  const isUnsafeLightness = l >= 0.4 && l <= 0.7;
   const hex = formatHex(oklch) || "#000000";
 
   return (
@@ -95,16 +95,14 @@ export default function OKLCHColorPicker({
       </div>
 
       {/* Lightness Warning */}
-      {isLightnessOutOfRange && (
+      {isUnsafeLightness && (
         <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md">
           <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-0.5" />
           <div className="text-xs text-amber-900 dark:text-amber-200">
-            <p className="font-semibold mb-1">
-              Lightness outside recommended range
-            </p>
+            <p className="font-semibold mb-1">Lightness in unsafe range</p>
             <p className="text-amber-700 dark:text-amber-300">
-              For optimal visibility in both light and dark modes, consider
-              adjusting lightness to 0.4-0.7 range.
+              For optimal contrast, use L &lt; 0.4 (for white text) or L &gt;
+              0.7 (for black text).
             </p>
           </div>
         </div>
@@ -119,28 +117,24 @@ export default function OKLCHColorPicker({
           </span>
         </div>
         <div className="relative">
-          {/* Ruler markers at recommended range */}
-          <div className="absolute -top-6 left-0 right-0 h-8 flex items-end">
-            {/* 0.4 marker */}
-            <div
-              className="absolute flex flex-col items-center"
-              style={{ left: "40%" }}
-            >
-              <span className="text-[10px] text-green-600 dark:text-green-400 font-mono mb-0.5">
-                0.4
-              </span>
-              <div className="w-px h-4 bg-green-500 dark:bg-green-400" />
-            </div>
-            {/* 0.7 marker */}
-            <div
-              className="absolute flex flex-col items-center"
-              style={{ left: "70%" }}
-            >
-              <span className="text-[10px] text-green-600 dark:text-green-400 font-mono mb-0.5">
-                0.7
-              </span>
-              <div className="w-px h-4 bg-green-500 dark:bg-green-400" />
-            </div>
+          {/* Recommended Range Indicators */}
+          <div className="absolute -top-6 left-0 right-0 h-8 pointer-events-none">
+            {/* Range 1: 0 - 0.4 */}
+            <div className="absolute bottom-0 left-0 w-[40%] h-1.5 bg-green-500/20 dark:bg-green-400/20 rounded-l-sm" />
+
+            {/* Range 2: 0.7 - 1.0 */}
+            <div className="absolute bottom-0 left-[70%] w-[30%] h-1.5 bg-green-500/20 dark:bg-green-400/20 rounded-r-sm" />
+
+            {/* Markers */}
+            <div className="absolute bottom-0 left-[40%] w-px h-3 bg-green-500 dark:bg-green-400" />
+            <span className="absolute -top-1 left-[40%] -translate-x-1/2 text-[9px] text-green-600 dark:text-green-400 font-mono font-bold">
+              0.4
+            </span>
+
+            <div className="absolute bottom-0 left-[70%] w-px h-3 bg-green-500 dark:bg-green-400" />
+            <span className="absolute -top-1 left-[70%] -translate-x-1/2 text-[9px] text-green-600 dark:text-green-400 font-mono font-bold">
+              0.7
+            </span>
           </div>
           <Slider
             value={[l]}

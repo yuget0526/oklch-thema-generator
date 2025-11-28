@@ -20,7 +20,7 @@ import LayerCountInput from "./LayerCountInput";
 import PalettePreview from "./PalettePreview";
 import ColorGroupCreator from "./ColorGroupCreator";
 import CodeExporter from "./CodeExporter";
-import NestedLayerPreview from "@/components/NestedLayerPreview";
+import { NestedLayerPreview } from "@/components/NestedLayerPreview";
 
 import {
   LayoutDashboard,
@@ -129,11 +129,6 @@ export default function ColorGenerator() {
     setCustomLightness(undefined);
   };
 
-  const handleModeChange = (mode: ThemeMode) => {
-    setBaseMode(mode);
-    setCustomLightness(undefined);
-  };
-
   const handleDirectionChange = (dir: "normal" | "inverted") => {
     setLayerDirection(dir);
     setCustomLightness(undefined);
@@ -207,12 +202,22 @@ export default function ColorGenerator() {
     }
   };
 
-  // Derived State - Brand Colors (3 variants)
-  const primaryVariants = generateBrandColors(primaryColor, "primary");
-
-  const secondaryVariants = generateBrandColors(secondaryColor, "secondary");
-
-  const tertiaryVariants = generateBrandColors(tertiaryColor, "tertiary");
+  // Derived State - Brand Colors (4 variants)
+  const primaryVariants = generateBrandColors(
+    primaryColor,
+    "primary",
+    baseMode
+  );
+  const secondaryVariants = generateBrandColors(
+    secondaryColor,
+    "secondary",
+    baseMode
+  );
+  const tertiaryVariants = generateBrandColors(
+    tertiaryColor,
+    "tertiary",
+    baseMode
+  );
 
   // Derived State - Background color values
   const effectiveBgHue = (() => {
@@ -296,6 +301,30 @@ export default function ColorGenerator() {
 
   // Calculate current lightness values for the chart
   const currentLightnessValues = layerScales.map((l) => l.oklch.l || 0);
+
+  const handleModeChange = (mode: ThemeMode) => {
+    // When switching modes, we want to set the current input color
+    // to the color that was generated for that mode.
+
+    const targetVariantName = mode === "light" ? "light" : "dark";
+
+    const newPrimary = primaryVariants.find(
+      (v) => v.name === targetVariantName
+    )?.hex;
+    const newSecondary = secondaryVariants.find(
+      (v) => v.name === targetVariantName
+    )?.hex;
+    const newTertiary = tertiaryVariants.find(
+      (v) => v.name === targetVariantName
+    )?.hex;
+
+    if (newPrimary) setPrimaryColor(newPrimary);
+    if (newSecondary) setSecondaryColor(newSecondary);
+    if (newTertiary) setTertiaryColor(newTertiary);
+
+    setBaseMode(mode);
+    setCustomLightness(undefined);
+  };
 
   const sidebarProps = {
     baseMode,
@@ -418,19 +447,25 @@ export default function ColorGenerator() {
                   <div className="space-y-8">
                     <PalettePreview
                       role="primary"
-                      variants={primaryVariants}
+                      variants={primaryVariants.filter((v) =>
+                        v.name.startsWith(baseMode)
+                      )}
                       overrides={currentModeOverrides}
                       onOverride={handleOverride}
                     />
                     <PalettePreview
                       role="secondary"
-                      variants={secondaryVariants}
+                      variants={secondaryVariants.filter((v) =>
+                        v.name.startsWith(baseMode)
+                      )}
                       overrides={currentModeOverrides}
                       onOverride={handleOverride}
                     />
                     <PalettePreview
                       role="tertiary"
-                      variants={tertiaryVariants}
+                      variants={tertiaryVariants.filter((v) =>
+                        v.name.startsWith(baseMode)
+                      )}
                       overrides={currentModeOverrides}
                       onOverride={handleOverride}
                     />
@@ -448,10 +483,39 @@ export default function ColorGenerator() {
                     <span>Opposite Theme ({oppositeMode})</span>
                   </h2>
                   <div className="space-y-8">
-                    {/* 
-                      For Opposite Theme, we only show Layers because Brand Colors are shared.
-                      If the user edits a color here, they are editing the OPPOSITE mode.
-                    */}
+                    <PalettePreview
+                      role="primary"
+                      variants={primaryVariants.filter((v) =>
+                        v.name.startsWith(oppositeMode)
+                      )}
+                      overrides={oppositeModeOverrides}
+                      onOverride={(v, h) => {
+                        const key = `${oppositeMode}:${v}`;
+                        setColorOverrides((prev) => ({ ...prev, [key]: h }));
+                      }}
+                    />
+                    <PalettePreview
+                      role="secondary"
+                      variants={secondaryVariants.filter((v) =>
+                        v.name.startsWith(oppositeMode)
+                      )}
+                      overrides={oppositeModeOverrides}
+                      onOverride={(v, h) => {
+                        const key = `${oppositeMode}:${v}`;
+                        setColorOverrides((prev) => ({ ...prev, [key]: h }));
+                      }}
+                    />
+                    <PalettePreview
+                      role="tertiary"
+                      variants={tertiaryVariants.filter((v) =>
+                        v.name.startsWith(oppositeMode)
+                      )}
+                      overrides={oppositeModeOverrides}
+                      onOverride={(v, h) => {
+                        const key = `${oppositeMode}:${v}`;
+                        setColorOverrides((prev) => ({ ...prev, [key]: h }));
+                      }}
+                    />
                     <PalettePreview
                       role="layers"
                       layers={inactiveLayers}
