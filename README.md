@@ -1,6 +1,6 @@
 # OKLCH Theme Generator
 
-![a11yPalette Hero Image](public/og-image.png)
+![a11yPalette App Preview](public/app-preview.png)
 
 [![Cloud Run](https://img.shields.io/badge/Google%20Cloud%20Run-Deployed-blue?logo=google-cloud&style=for-the-badge)](https://a11ypalette.gigaptera.com)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js&style=for-the-badge)](https://nextjs.org/)
