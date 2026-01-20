@@ -268,7 +268,7 @@ export function NestedLayerPreview({
         {/* Main Content */}
         <div className="text-center space-y-6 max-w-2xl mx-auto mb-16">
           <h1
-            className="text-5xl font-bold tracking-tight"
+            className="text-3xl md:text-5xl font-bold tracking-tight"
             style={{ color: pMain.hex }}
           >
             Nested Layers

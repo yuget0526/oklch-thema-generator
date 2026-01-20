@@ -33,7 +33,8 @@
     "copyLink": "Copy Link",
     "share": "Share",
     "buyMeACoffee": "Buy Me a Coffee",
-    "themeSwitch": "Switch Theme"
+    "themeSwitch": "Switch Theme",
+    "recommendDesktop": "We recommend using a desktop for the best experience."
   },
   "BackgroundColorControls": {
     "title": "Background Color",

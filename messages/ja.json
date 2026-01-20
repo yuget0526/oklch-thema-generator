@@ -33,7 +33,8 @@
     "copyLink": "リンクをコピー",
     "share": "シェア",
     "buyMeACoffee": "Buy Me a Coffee",
-    "themeSwitch": "テーマ切り替え"
+    "themeSwitch": "テーマ切り替え",
+    "recommendDesktop": "より快適にご利用いただくために、PCでの閲覧を推奨します。"
   },
   "BackgroundColorControls": {
     "title": "背景色設定",

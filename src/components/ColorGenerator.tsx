@@ -59,6 +59,33 @@ export default function ColorGenerator() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  // Existing Hook usage
+  // ...
+
+  useEffect(() => {
+    // Check for mobile device on mount
+    const checkMobile = () => {
+      // 1024px is the 'lg' breakpoint in Tailwind where the sidebar becomes visible
+      if (window.innerWidth < 1024) {
+        // Use a small timeout to ensure toast library is ready/mounted if needed,
+        // essentially just notifying once.
+        // We use sessionStorage to avoid annoying the user on every reload if they refresh?
+        // User asked for "Disclaimer", implying single notice is fine, but maybe repeated is okay.
+        // Let's settle for checking sessionStorage to be polite.
+        const hasNotified = sessionStorage.getItem("mobile-notice-shown");
+        if (!hasNotified) {
+          toast.info(t("recommendDesktop"), {
+            duration: 5000,
+            icon: "💻", // Desktop icon
+          });
+          sessionStorage.setItem("mobile-notice-shown", "true");
+        }
+      }
+    };
+
+    checkMobile();
+  }, [t]);
+
   // Initial State from URL
   const [primaryColor, setPrimaryColor] = useState<string>(
     searchParams.get("p") ? `#${searchParams.get("p")}` : "#3b82f6",
@@ -355,6 +382,13 @@ export default function ColorGenerator() {
     setCustomLightness(undefined);
   };
 
+  const handleRandomize = () => {
+    const palette = generateRandomPalette(currentBgHex);
+    setPrimaryColor(palette.primary);
+    setSecondaryColor(palette.secondary);
+    setTertiaryColor(palette.tertiary);
+  };
+
   const sidebarProps = {
     baseMode,
     layerCount,
@@ -387,13 +421,8 @@ export default function ColorGenerator() {
     handleBgHexChange,
     simulationMode,
     setSimulationMode,
-  };
-
-  const handleRandomize = () => {
-    const palette = generateRandomPalette(currentBgHex);
-    setPrimaryColor(palette.primary);
-    setSecondaryColor(palette.secondary);
-    setTertiaryColor(palette.tertiary);
+    onRandomize: handleRandomize,
+    onModeChange: handleModeChange,
   };
 
   return (
@@ -425,24 +454,26 @@ export default function ColorGenerator() {
               </Sheet>
             </div>
 
-            <div className="flex items-center gap-2 lg:hidden">
-              <CopyLinkButton />
+            <div className="flex items-center gap-2">
+              <div className="lg:hidden flex items-center gap-1">
+                <LocaleSwitcher />
+                <CopyLinkButton />
+              </div>
+              <TabsList>
+                <TabsTrigger value="preview" className="space-x-2">
+                  <LayoutDashboard size={16} />
+                  <span className="hidden sm:inline">{t("preview")}</span>
+                </TabsTrigger>
+                <TabsTrigger value="palette" className="space-x-2">
+                  <Palette size={16} />
+                  <span className="hidden sm:inline">{t("palette")}</span>
+                </TabsTrigger>
+                <TabsTrigger value="code" className="space-x-2">
+                  <Code size={16} />
+                  <span className="hidden sm:inline">{t("export")}</span>
+                </TabsTrigger>
+              </TabsList>
             </div>
-
-            <TabsList>
-              <TabsTrigger value="preview" className="space-x-2">
-                <LayoutDashboard size={16} />
-                <span>{t("preview")}</span>
-              </TabsTrigger>
-              <TabsTrigger value="palette" className="space-x-2">
-                <Palette size={16} />
-                <span>{t("palette")}</span>
-              </TabsTrigger>
-              <TabsTrigger value="code" className="space-x-2">
-                <Code size={16} />
-                <span>{t("export")}</span>
-              </TabsTrigger>
-            </TabsList>
 
             <div className="hidden lg:flex items-center gap-2">
               <SimulationControl
@@ -728,6 +759,10 @@ interface SidebarContentProps {
   handleBgHueChange: (hue: number) => void;
   handleBgChromaChange: (chroma: number) => void;
   handleBgHexChange: (hex: string) => void;
+  onRandomize: () => void;
+  onModeChange: (mode: ThemeMode) => void;
+  simulationMode: SimulationType;
+  setSimulationMode: (mode: SimulationType) => void;
 }
 
 function SidebarContent({
@@ -760,6 +795,10 @@ function SidebarContent({
   handleBgHueChange,
   handleBgChromaChange,
   handleBgHexChange,
+  onRandomize,
+  onModeChange,
+  simulationMode,
+  setSimulationMode,
 }: SidebarContentProps) {
   const t = useTranslations("ColorGenerator");
   // Determine chart range based on mode
@@ -777,7 +816,36 @@ function SidebarContent({
             height={32}
             className="w-8 h-8"
           />
-          <h1 className="font-bold text-lg tracking-tight">a11yPalette</h1>
+          <h1 className="hidden md:block font-bold text-lg tracking-tight">
+            a11yPalette
+          </h1>
+        </div>
+        {/* Mobile Actions (Visible only in Sheet/Mobile View usually, but Sidebar is hidden on lg anyway) */}
+        {/* Add mr-8 to avoid overlap with the Sheet's default Close button (absolute positioned top-right) */}
+        <div className="flex lg:hidden items-center gap-1 mr-8">
+          <SimulationControl
+            simulationMode={simulationMode}
+            onSimulationChange={setSimulationMode}
+            variant="header"
+          />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onRandomize}
+            title={t("randomize")}
+          >
+            <Dices size={18} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() =>
+              onModeChange(baseMode === "light" ? "dark" : "light")
+            }
+            title={t("themeSwitch")}
+          >
+            {baseMode === "light" ? <Moon size={18} /> : <Sun size={18} />}
+          </Button>
         </div>
       </div>
 
@@ -903,6 +971,25 @@ function SidebarContent({
             </div>
           </section>
         </div>
+      </div>
+
+      {/* Mobile Sidebar Footer: Social Links */}
+      <div className="lg:hidden p-4 border-t bg-muted/20 flex justify-center gap-4">
+        <BuyMeACoffeeButton />
+        <ShareButton />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() =>
+            window.open(
+              "https://github.com/gigaptera/oklch-theme-generator",
+              "_blank",
+            )
+          }
+          title="GitHub"
+        >
+          <Github size={20} />
+        </Button>
       </div>
     </div>
   );
