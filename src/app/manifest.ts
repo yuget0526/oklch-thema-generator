@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "a11yPalette - OKLCH Theme Generator",
+    name: "a11yPalette - Design System Color Palette",
     short_name: "a11yPalette",
     description:
       "Generate accessible, consistent color palettes using the OKLCH color space.",

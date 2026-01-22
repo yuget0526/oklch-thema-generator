@@ -817,7 +817,7 @@ function SidebarContent({
             className="w-8 h-8"
           />
           <h1 className="hidden md:block font-bold text-lg tracking-tight">
-            a11yPalette
+            {t("appTitle")}
           </h1>
         </div>
         {/* Mobile Actions (Visible only in Sheet/Mobile View usually, but Sidebar is hidden on lg anyway) */}
@@ -1022,7 +1022,7 @@ const ShareButton = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "a11yPalette",
+          title: t("appTitle"),
           text: "Check out this accessible color palette!",
           url: window.location.href,
         });

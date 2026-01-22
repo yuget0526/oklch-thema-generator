@@ -1,13 +1,14 @@
 {
   "Metadata": {
-    "title": "a11yPalette - OKLCH Theme Generator",
-    "description": "Generate accessible, consistent color palettes using the OKLCH color space."
+    "title": "OKLCH Color Palette Generator for Design Systems | a11yPalette",
+    "description": "Generate accessible, consistent design system color palettes using the OKLCH color space. a11yPalette is a professional tool for UI designers."
   },
   "Common": {
     "loading": "Loading...",
     "error": "An error occurred"
   },
   "ColorGenerator": {
+    "appTitle": "OKLCH Color Palette Generator",
     "brandColors": "Brand Colors",
     "primary": "Primary",
     "background": "Background Color",

@@ -1,6 +1,6 @@
-# OKLCH Theme Generator
+# a11yPalette | Design System Color Palette
 
-![a11yPalette App Preview](public/app-preview.png)
+![Lumina App Preview](public/app-preview.png)
 
 [![Cloud Run](https://img.shields.io/badge/Google%20Cloud%20Run-Deployed-blue?logo=google-cloud&style=for-the-badge)](https://a11ypalette.gigaptera.com)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js&style=for-the-badge)](https://nextjs.org/)
@@ -20,7 +20,7 @@
 
 ### Overview
 
-OKLCH Theme Generator is a professional color theme generation tool built with the OKLCH color space. It enables designers and developers to create consistent, accessible color systems that work seamlessly across both light and dark modes.
+**a11yPalette** is a professional design system color palette generator built with the OKLCH color space. It enables designers and developers to create consistent, accessible color systems that work seamlessly across both light and dark modes.
 
 **Key Features:**
 
@@ -224,7 +224,7 @@ This application uses **Google Analytics** to collect anonymous usage data (e.g.
 
 ### 概要
 
-OKLCH Theme Generator は、OKLCH カラースペースを使用したプロフェッショナルなカラーテーマ生成ツールです。デザイナーと開発者が、ライトモードとダークモードの両方でシームレスに機能する、一貫性があり、アクセシブルなカラーシステムを作成できます。
+**a11yPalette（エーイレブンワイパレット）** は、OKLCH カラースペースを使用したプロフェッショナルなデザインシステム用カラーパレット生成ツールです。デザイナーと開発者が、ライトモードとダークモードの両方でシームレスに機能する、一貫性があり、アクセシブルなカラーシステムを作成できます。
 
 **主な機能:**
 
